@@ -1,0 +1,6 @@
+#shape, x, y, z, scaleX, scaleY, scaleZ, rotationX, rotationY, rotationZ, ColorR, ColorG, ColorB
+#cube, 10, 20, 30
+#sphere, 10, 20, 50
+cube, 10, 20, 20, 2, 2, 2, 35, 0, 0, 57, 182, 58
+sphere, 10, 20, 10, 2, 2, 2, 35, 0, 0, 0, 0, 0
+sphere, 2, 3, 5
