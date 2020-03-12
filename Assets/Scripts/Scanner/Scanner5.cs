@@ -98,11 +98,12 @@ public class Scanner5 : MonoBehaviour
         { //Preguntar si es punto y coma
             addToken(TokenType.SEMI, ch.ToString());
             advance();
-        }else if (ch.Equals(':'))
-        {
-            addToken(TokenType.COLON, ch.ToString());
-            advance();
         }
+        //else if (ch.Equals(':'))
+        //{
+        //    addToken(TokenType.COLON, ch.ToString());
+        //    advance();
+        //}
         else if (ch.Equals('.'))
         {
             addToken(TokenType.DOT, ch.ToString());
@@ -138,7 +139,6 @@ public class Scanner5 : MonoBehaviour
             id += currentChar;
             currentChar = advance();
         }
-
         if (KeyWords.dict.ContainsKey(id))
         {
             tokenList.Add(KeyWords.dict[id]);
@@ -147,6 +147,7 @@ public class Scanner5 : MonoBehaviour
         {
             addToken(TokenType.ID, id);
         }
+        Symbols(currentChar);
     }
 
     /// <summary>
@@ -165,7 +166,7 @@ public class Scanner5 : MonoBehaviour
             getNumber();
         }
         //C es un signo de más
-        else if (currentChar.Equals(' '))
+        else if (currentChar.Equals(' ') || currentChar.Equals('\r') || currentChar.Equals('\n')|| currentChar.Equals('\t'))
             currentChar = ' ';
         else
         {
@@ -201,6 +202,15 @@ public class Scanner5 : MonoBehaviour
         }
         tokenList.Add(new Token(TokenType.EOF, null)); //Se añade un token que indica el final del texto fuente
         return tokenList; //Regresa la lista de tokens
+    }
+
+    /// <summary>
+    /// Regresa la lista de tokens
+    /// </summary>
+    /// <returns></returns>
+    public List<Token> GetTokenList()
+    {
+        return tokenList;
     }
 
     /// <summary>
@@ -279,6 +289,7 @@ public class Scanner5 : MonoBehaviour
         { 
             addToken(TokenType.INTEGER, num);
         }
+        Symbols(currentChar);
     }
 
     /// <summary>
@@ -320,7 +331,7 @@ public class Scanner5 : MonoBehaviour
     {
         foreach(Token t in tokenList)
         {
-            Debug.Log(t.to_String());
+            Debug.Log("Token: " + t.to_String() + " Type: " + t.tokenType);
         }
     }
 }

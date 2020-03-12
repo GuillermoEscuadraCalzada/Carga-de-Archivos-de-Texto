@@ -30,40 +30,37 @@ public enum TokenType
 
 public class Token
 {
+    /// <summary>
+    /// El tipo de token de este token
+    /// </summary>
     public TokenType tokenType;
-    public string typeName;
+    
+    /// <summary>
+    /// El nombre del token
+    /// </summary>
     public string lexeme;
     
-    //Constructor de la clase token, la cual recibe un enum y el string que la determinará
-    //Ejemplo: Int ---- 1
-    //         Plus --- +
+
+    /// <summary>
+    /// Constructor de la clase token, recibe un tipo de Token y un nombre
+    /// </summary>
+    /// <param name="_token"></param>
+    /// <param name="_lexeme"></param>
     public Token(TokenType _token, string _lexeme)
     {
         tokenType = _token;
         lexeme = _lexeme;
     }
 
-    /*Se convierte el tipo de string más el string que se introdujo
-     *  Ejemplo: integer:1
-     *  return un string*/
+
+     /// <summary>
+     /// Esto manda el token en form ad estring
+     /// </summary>
+     /// <returns></returns>
     public string to_String()
     {
-        //TypeString();
+
         return lexeme;
     }
 
-    public string TypeString()
-    {
-        if (tokenType.Equals(TokenType.INTEGER)) {
-            typeName = "integer";
-        }else if (tokenType.Equals(TokenType.MINUS))
-        {
-            typeName = "minus";
-        }
-        else if (tokenType.Equals(TokenType.PLUS))
-        {
-            typeName = "plus";
-        }
-        return typeName;
-    }
 }

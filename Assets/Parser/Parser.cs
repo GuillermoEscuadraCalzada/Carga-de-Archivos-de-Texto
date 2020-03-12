@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+#if false
 public class Parser : MonoBehaviour
 {
     public Scanner5 scanner;
@@ -11,7 +12,6 @@ public class Parser : MonoBehaviour
     {
         this.scanner = scanner;
     }
-
     /// <summary>
     /// El bloque principal del programa, a partir de aquí, inicia todo
     /// </summary>
@@ -156,7 +156,6 @@ public class Parser : MonoBehaviour
         }
         return node;
     }
-
     public Node parse()
     {
         currentToken = scanner.getNextToken();
@@ -164,3 +163,5 @@ public class Parser : MonoBehaviour
         return expretion();
     }
 }
+
+#endif

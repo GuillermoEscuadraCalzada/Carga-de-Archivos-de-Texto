@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
+#if false
 public interface IVisitable {
     void Accept (IVisitor visitor);
 }
@@ -253,3 +254,4 @@ public class Interpreter : MonoBehaviour
     }
    
 }
+#endif

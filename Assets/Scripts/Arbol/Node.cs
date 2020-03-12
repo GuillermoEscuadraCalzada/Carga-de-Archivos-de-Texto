@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+#if false
 public enum NodeType { BINOP, NUM, UNOP}
-
 public abstract class Node : IVisitable
 { //Nodo que se encuentra dentro del árbol
     public Node left; //Nodo izquierdo
@@ -153,3 +153,4 @@ public class Type: Node
         visitor.Visit(this);
     }
 }
+#endif
