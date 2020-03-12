@@ -111,7 +111,7 @@ public class Scanner2 : MonoBehaviour
     {
         currentToken = getNextToken();
         Token left = currentToken;
-        if (left.token.Equals(TokenType.INTEGER))
+        if (left.tokenType.Equals(TokenType.INTEGER))
             currentToken = getNextToken();
         else
         {
@@ -119,9 +119,9 @@ public class Scanner2 : MonoBehaviour
             return 0;
         }
         Token middle = currentToken;
-        if (middle.token.Equals(TokenType.PLUS))
+        if (middle.tokenType.Equals(TokenType.PLUS))
             currentToken = getNextToken();
-        else if (middle.token.Equals(TokenType.MINUS))
+        else if (middle.tokenType.Equals(TokenType.MINUS))
             currentToken = getNextToken();
         else
         {
@@ -131,7 +131,7 @@ public class Scanner2 : MonoBehaviour
 
         Token right = currentToken;
 
-        if (right.token.Equals(TokenType.INTEGER))
+        if (right.tokenType.Equals(TokenType.INTEGER))
             currentToken = tokenList[0];
         else
         {
@@ -139,11 +139,11 @@ public class Scanner2 : MonoBehaviour
             return 0;
         }
         int result = 0;
-        if (middle.token.Equals(TokenType.PLUS))
+        if (middle.tokenType.Equals(TokenType.PLUS))
         {
             result = int.Parse(left.lexeme) + int.Parse(right.lexeme);
         }
-        else if (middle.token.Equals(TokenType.MINUS))
+        else if (middle.tokenType.Equals(TokenType.MINUS))
         {
             result = int.Parse(left.lexeme) - int.Parse(right.lexeme);
         }

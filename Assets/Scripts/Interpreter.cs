@@ -7,22 +7,81 @@ public interface IVisitable {
     void Accept (IVisitor visitor);
 }
 
+/*Se crea una función de visita para cada uno de los nodos que se crearon para almacenar cada uno de los tokens*/
 public interface IVisitor {
-    public void Visit (Num num);
-    //void Visit (Num num);
+    /// <summary>
+    /// Visita el nodo número
+    /// </summary>
+    /// <param name="num"></param>
+    void Visit(Num num);
+
+    /// <summary>
+    /// Visita el nodo Bloque
+    /// </summary>
+    /// <param name="block"></param>
     void Visit(BinOp block);
+
+    /// <summary>
+    /// Visita el nodo Operación Unaria
+    /// </summary>
+    /// <param name="unary"></param>
     void Visit (UnaryOp unary);
+    
+    /// <summary>
+    /// Visita el nodo Compund
+    /// </summary>
+    /// <param name="unary"></param>
     void Visit (Compund compund);
+   
+    /// <summary>
+    /// Visita el nodo Type
+    /// </summary>
+    /// <param name="unary"></param>
     void Visit (Type type);
+    
+    /// <summary>
+    /// Visita el nodo VarDecl
+    /// </summary>
+    /// <param name="unary"></param>
     void Visit (VarDecl varDecl);
+    
+    /// <summary>
+    /// Visita el nodo Var
+    /// </summary>
+    /// <param name="unary"></param>
     void Visit (Var var);
+   
+    /// <summary>
+    /// Visita el nodo Block
+    /// </summary>
+    /// <param name="unary"></param>
     void Visit (Block block);
+    
+    /// <summary>
+    /// Visita el nodo NoOp
+    /// </summary>
+    /// <param name="unary"></param>
     void Visit (NoOP var);
+    
+    /// <summary>
+    /// Visita el nodo Program
+    /// </summary>
+    /// <param name="unary"></param>
     void Visit (Program program);
+  
+    /// <summary>
+    /// Visita el nodo Assign
+    /// </summary>
+    /// <param name="unary"></param>
     void Visit (Assign program);
 }
 
+/// <summary>
+/// Obtienes el valor de la función que se desee
+/// </summary>
 class ValueGetter {
+    System.Object value; 
+    
     public static System.Object GetValue(Node n) {
         NodeVisitor visitor = new NodeVisitor();
         n.Accept(visitor);
@@ -33,7 +92,6 @@ class ValueGetter {
     public void Return(System.Object val) {
         value = val;
     }
-    System.Object value;
 }
 
 class NodeVisitor : ValueGetter, IVisitor
@@ -74,20 +132,22 @@ class NodeVisitor : ValueGetter, IVisitor
 
     public void Visit (BinOp block) {
         Return(block);
-
     }
 
     public void Visit (UnaryOp unary) {
-        //Return(unary)
+        Return(unary);
     }
 
     public void Visit (Compund compund) {
+        Return(compund);
     }
 
     public void Visit (Type type) {
+        Return(type);
     }
 
     public void Visit (VarDecl varDecl) {
+        Return(varDecl);
     }
 
     public void Visit (Var var) {
@@ -95,19 +155,19 @@ class NodeVisitor : ValueGetter, IVisitor
     }
 
     public void Visit (Block block) {
-        throw new System.NotImplementedException();
+        Return(block);
     }
 
     public void Visit (NoOP var) {
-        throw new System.NotImplementedException();
+        Return(var);
     }
 
     public void Visit (Program program) {
-        throw new System.NotImplementedException();
+        Return(program);
     }
 
-    public void Visit (Assign program) {
-        throw new System.NotImplementedException();
+    public void Visit (Assign assign) {
+        Return(assign);
     }
 }
 

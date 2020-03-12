@@ -12,7 +12,11 @@ public class Parser : MonoBehaviour
         this.scanner = scanner;
     }
 
-    Node program () { //El bloque principal del programa, a partir de aquí, inicia todo
+    /// <summary>
+    /// El bloque principal del programa, a partir de aquí, inicia todo
+    /// </summary>
+    /// <returns></returns>
+    Node program () { 
         validateToken(TokenType.PROGRAM);
         Node varNode = variable();
         validateToken(TokenType.SEMI);
@@ -21,12 +25,19 @@ public class Parser : MonoBehaviour
         return null;
     }
 
-    /*Se crea un nodo bloque donde las declaraciones*/
+    /// <summary>
+    /// Se crea un nodo bloque donde las declaraciones
+    /// </summary>
+    /// <returns></returns>
     Block block (){
         Block block= new Block(declarations(), compundStatement());
         return block;
     }
-    //Se crea un nodo variable donde se almacenan los valores al inicio del programa
+    
+    /// <summary>
+    /// Se crea un nodo variable donde se almacenan los valores al inicio del programa
+    /// </summary>
+    /// <returns></returns>
     Node variable () {
         //variable : ID
         Node variable = new Var(currentToken);
@@ -61,25 +72,34 @@ public class Parser : MonoBehaviour
     Node statement () {
         return null;
     }
+
+    /// <summary>
+    /// Valida el token actual preguntando si su tipo se encuentra dentro de los adecuados
+    /// </summary>
+    /// <param name="tokenType"></param>
     void validateToken(TokenType tokenType) {
-        if(currentToken.token == tokenType)
+        if(currentToken.tokenType.Equals(tokenType))
         {
             currentToken = scanner.getNextToken();
-        }else
+        } else
         {
             Debug.Log("Invalid Token! " + currentToken.typeName);
         }
     }
 
+    /// <summary>
+    /// Pregunta si el primer elemento es un número o si es un paréntesis, en caso de ser un paréntesis se reinicia la búsqueda con expretion pero desde el token siguiente
+    /// </summary>
+    /// <returns></returns>
     Node factor() {
 
         Node node = null;
-        if (currentToken.token.Equals(TokenType.INTEGER)) { //Pregunta si el token actual es un entero
+        if (currentToken.tokenType.Equals(TokenType.INTEGER)) { //Pregunta si el token actual es un entero
             node =  new Num(currentToken);
             validateToken(TokenType.INTEGER);
             return node;
         }
-        else if (currentToken.token.Equals(TokenType.LPAR))
+        else if (currentToken.tokenType.Equals(TokenType.LPAR))
         { //Pregunta si el token actual es un entero
             validateToken(TokenType.LPAR);
             //currentToken = scanner.getNextToken();
@@ -91,41 +111,46 @@ public class Parser : MonoBehaviour
         return node;
     }
 
-    Node term() { //Preguntar si el token siguiente es multiplicación o división
+    /// <summary>
+    ///Preguntar si el token siguiente es multiplicación o división
+    /// </summary>
+    /// <returns></returns>
+    Node term() { 
         Node node = factor();
 
-        while (currentToken.token >= TokenType.MULT && currentToken.token <= TokenType.INTEGER_DIV)
+        /**/
+        while (currentToken.tokenType >= TokenType.MULT && currentToken.tokenType <= TokenType.INTEGER_DIV)
         {
             Token token = currentToken;
-            if (token.token.Equals(TokenType.MULT))
+            if (token.tokenType.Equals(TokenType.MULT))
             { //Si el token actual es PLUS, haz una suma
                 validateToken(TokenType.MULT);
-                //currentToken = scanner.getNextToken();
             }
-            else if (token.token.Equals(TokenType.INTEGER_DIV))
+            else if (token.tokenType.Equals(TokenType.INTEGER_DIV))
             {//Si el token actual es MINUS, haz una resta
                 validateToken(TokenType.INTEGER_DIV);
-                //currentToken = scanner.getNextToken();
             }
             node = new BinOp(node, token, factor()); //Regresa un operador binario
         }
         return node; //regresa el nodo
     }
-
+    
+    /// <summary>
+    /// Es lo que se encuentra dentro del archivo o dentro de un string
+    /// </summary>
+    /// <returns></returns>
     Node expretion() {
         Node node = term();
-        while (currentToken.token <= TokenType.PLUS && currentToken.token >= TokenType.MINUS)
+        while (currentToken.tokenType <= TokenType.PLUS && currentToken.tokenType >= TokenType.MINUS)
         {
             Token t = currentToken;
-            if (t.token.Equals(TokenType.PLUS))
+            if (t.tokenType.Equals(TokenType.PLUS))
             {
                 validateToken(TokenType.PLUS);
-                //currentToken = scanner.getNextToken();
             }
-            if (t.token.Equals(TokenType.MINUS))
+            if (t.tokenType.Equals(TokenType.MINUS))
             {
                 validateToken(TokenType.MINUS);
-                //currentToken = scanner.getNextToken();
             }
             node = new BinOp(node, t, term());
         }

@@ -26,17 +26,21 @@ public class Scanner5 : MonoBehaviour
         //}
     }
 
-    /*Indicamos el  texto a escanear
-     *@param[String text] texto fuente que se analizará*/
+
+    /// <summary>
+    /// Indicamos el  texto a escanear
+    /// </summary>
+    /// <param name="text"> texto fuente que se analizará</param>
     public void setTextToScan(string text)
     {
-        
         resetScan();
         textSource = text;
         scanTokens();
     }
 
-    /*Se resetea el escaner, todos las variables vuelven a su estado principal*/
+    /// <summary>
+    /// Se resetea el escaner, todos las variables vuelven a su estado principal
+    /// </summary>
     private void resetScan()
     {
         tokenList.Clear();
@@ -48,10 +52,13 @@ public class Scanner5 : MonoBehaviour
         tokenIndex = 0;
     }
 
-    /*Escanea el caracter para detectar qué tipo de símbolo es 
-     *@param[char ch] caracter a analizar
-     *return regresa el caracter después de determinar token o lanzar error*/
-    char symbols(char ch)
+
+    /// <summary>
+    /// Escanea el caracter para detectar qué tipo de símbolo es 
+    /// </summary>
+    /// <returns> char </returns>
+    /// <param name="ch"></param>
+    char Symbols(char ch)
     {
         //Pregunta qué caracter puede ser el char 'ch', si es más, menos, multiplicación, división
         if (ch.Equals('+'))
@@ -68,15 +75,24 @@ public class Scanner5 : MonoBehaviour
             addToken(TokenType.RPAR); //El símbolo es de división
         else if (ch.Equals('{'))
         { //Añadir comentarios
-            skip_comment();
+            Skip_Comment();
         } else if (char.IsLetter(ch))
         { //Preguntas si el caracter es una letra
-            identifier();
-        } else if (ch.Equals(':') && peek().Equals('='))
+            Identifier();
+        } else if (ch.Equals(':') && peek() == '=')
         { //Preguntar si el char actual y el próximo es el siguiente string :=
-            advance();
-            advance();
-            addToken(TokenType.ASSIGN, ":=");
+            //char equals = peek();
+            //if(equals == '=')
+            //{
+                advance();
+                advance();
+                addToken(TokenType.ASSIGN, ":=");
+            //}
+            //else
+            //{
+            //    addToken(TokenType.COLON, ch.ToString());
+            //    advance();
+            //}
         }
         else if (ch.Equals(';'))
         { //Preguntar si es punto y coma
@@ -101,15 +117,21 @@ public class Scanner5 : MonoBehaviour
         return ch;
     }
 
-    void skip_comment()
+    /// <summary>
+    /// Se salta todo lo que se encuentre dentro de las llaves '{' y '}'
+    /// </summary>
+    void Skip_Comment()
     {
         while(!currentChar.Equals('}') && !currentChar.Equals('\0'))  { //Avanza hasta encontrar un final de línea o una llave de cierre
-            advance();
+            currentChar = advance();
         }
         advance();
     }
-    void identifier()
-    {
+
+    /// <summary>
+    /// Identifica si el string es una palabra reservada dentro del diccionario o es una palabra diferente, para lo cual lo meterá dentro de un ID
+    /// </summary>
+    void Identifier() { 
         string id = "";
         while(char.IsLetterOrDigit(currentChar) && !currentChar.Equals('\0'))
         {
@@ -126,7 +148,11 @@ public class Scanner5 : MonoBehaviour
             addToken(TokenType.ID, id);
         }
     }
-    //Se escanean todos los tokens dentro de los strings existentes
+
+    /// <summary>
+    /// Se escanean todos los tokens dentro de los strings existentes
+    /// </summary>
+    /// <returns></returns>
     public char scanToken()
     {
         string str = null; //Guarda un string que sea nulo
@@ -143,7 +169,7 @@ public class Scanner5 : MonoBehaviour
             currentChar = ' ';
         else
         {
-            symbols(currentChar); //Detectar qué simbolo es.
+            Symbols(currentChar); //Detectar qué simbolo es.
         }
 
         if (!isAtEnd())
@@ -153,7 +179,7 @@ public class Scanner5 : MonoBehaviour
     }
 
     char peek() {
-        peek_pos = current + 1;
+        peek_pos = current;
         if(peek_pos > textSource.Length)
         {
             return '\0';
@@ -162,6 +188,10 @@ public class Scanner5 : MonoBehaviour
         return textSource[peek_pos];
     }
 
+    /// <summary>
+    /// Se escanean todos los tokens que se encuentren dentro de la lista de tokens y se regresa esta misma lista
+    /// </summary>
+    /// <returns></returns>
     List<Token> scanTokens()
     {
         while (!isAtEnd())
@@ -173,32 +203,44 @@ public class Scanner5 : MonoBehaviour
         return tokenList; //Regresa la lista de tokens
     }
 
-    //Se agrega un token de símbolos, no necesitan strings
+    /// <summary>
+    /// Se agrega un token de símbolos, no necesitan strings
+    /// </summary>
+    /// <param name="token"></param>
     void addToken(TokenType token)
     {
         tokenList.Add(new Token(token, null));
     }
 
-    //Se agrega un token con un valor de string
+    /// <summary>
+    /// Se agrega un token con un valor de string
+    /// </summary>
+    /// <param name="token"></param>
+    /// <param name="lexeme"></param>
     void addToken(TokenType token, string lexeme)
     {
         tokenList.Add(new Token(token, lexeme));
     }
 
-    /*Pregunt si el índice current está al final de la lista*/
+    /// <summary>
+    /// Pregunt si el índice current está al final de la lista
+    /// </summary>
+    /// <returns></returns>
     bool isAtEnd()
     {
         return current > textSource.Length;
     }
 
-    /*Avanza dentro del texto fuente para regresarons un caracter
-     *@return el caracter a analizar*/
+     /// <summary>
+    /// Avanza dentro del texto fuente para regresarons un caracter
+    ///
+    /// </summary>
+    /// <returns></returns>
     char advance() {
 
         /*Pregunta en qué posición se encuentra actualmente current dentro del texto a analizar  y se avanza uno constantemente*/
         if (current < textSource.Length)
         {
-
             current++;
             return textSource[current - 1];
         }
@@ -212,31 +254,37 @@ public class Scanner5 : MonoBehaviour
             return ' ';
     }
 
+    /// <summary>
+    /// Busca obtener qué tipo de número es, si es entero o real (flotante)
+    /// </summary>
     void getNumber() {
         string num = "";
         while(char.IsDigit(currentChar)&& !currentChar.Equals('\0'))
-        {
+        { //Es un número, lo añade al strint y avanza
             num += currentChar;
-            advance();
+            currentChar = advance();
         }
-        if(currentChar == '.')
-        {
+        if(currentChar.Equals('.'))
+        { //Si el siguiente token es un punto repite el while hasta terminar en todos los decimales
             num += currentChar;
-            advance();
+            currentChar = advance();
             while(char.IsDigit(currentChar) && !currentChar.Equals('\0'))
-            {
+            { //Vuelve a avanzar el string dentro del char actual
                 num += currentChar;
+                currentChar = advance();
             }
             addToken(TokenType.REAL, num);
         }
         else
-        {
-            num += currentChar;
+        { 
             addToken(TokenType.INTEGER, num);
         }
     }
 
-    /*Avanza en la lista de tokens y lo guarda en una variable*/
+    /// <summary>
+    /// Avanza en la lista de tokens y lo guarda en una variable
+    /// </summary>
+    /// <returns></returns>
     public Token getNextToken()
     {
         Token newToken;
@@ -251,16 +299,23 @@ public class Scanner5 : MonoBehaviour
         return newToken; //Regresa el token
     }
 
+    /// <summary>
+    /// El token es un número
+    /// </summary>
+    /// <returns></returns>
     int tokenIsDigit()
     {
         currentToken = getNextToken(); //El current Token irá avanzando entre la oración ingresada por el usuario
         Token t = currentToken;
-        if (t.token.Equals(TokenType.INTEGER))
+        if (t.tokenType.Equals(TokenType.INTEGER))
             return int.Parse(t.lexeme);
         else
             return -1;
     }
 
+    /// <summary>
+    /// Se imprime todo el escaner
+    /// </summary>
     public void printScanner ()
     {
         foreach(Token t in tokenList)

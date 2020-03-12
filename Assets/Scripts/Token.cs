@@ -30,7 +30,7 @@ public enum TokenType
 
 public class Token
 {
-    public TokenType token;
+    public TokenType tokenType;
     public string typeName;
     public string lexeme;
     
@@ -39,7 +39,7 @@ public class Token
     //         Plus --- +
     public Token(TokenType _token, string _lexeme)
     {
-        token = _token;
+        tokenType = _token;
         lexeme = _lexeme;
     }
 
@@ -49,18 +49,18 @@ public class Token
     public string to_String()
     {
         //TypeString();
-        return lexeme + ":" + typeName;
+        return lexeme;
     }
 
     public string TypeString()
     {
-        if (token.Equals(TokenType.INTEGER)) {
+        if (tokenType.Equals(TokenType.INTEGER)) {
             typeName = "integer";
-        }else if (token.Equals(TokenType.MINUS))
+        }else if (tokenType.Equals(TokenType.MINUS))
         {
             typeName = "minus";
         }
-        else if (token.Equals(TokenType.PLUS))
+        else if (tokenType.Equals(TokenType.PLUS))
         {
             typeName = "plus";
         }
