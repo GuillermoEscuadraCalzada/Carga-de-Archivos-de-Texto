@@ -13,6 +13,8 @@ public abstract class Variables
     /// </summary>
     public TokenType tokenType;
     
+
+
     /// <summary>
     /// El identificador de cada variable (nombre)
     /// </summary>
@@ -87,6 +89,10 @@ public class VariablesFloat : Variables
         this.ID = id;
         tokenType = type;
     }
+    public VariablesFloat()
+    {
+        tokenType = TokenType.REAL;
+    }
 
     /// <summary>
     /// Regresa el valor de este nodo variable
@@ -144,11 +150,48 @@ public class NodeLR
         token = type;
     }
   
+    /// <summary>
+    /// Obtiene un nodo en la parte izquierda, un token y un nodo a la derecha. Dependiendo del token se puede realizar: suma, resta, multiplicación o división
+    /// </summary>
+    /// <param name="left"></param>
+    /// <param name="type"></param>
+    /// <param name="right"></param>
     public NodeLR(NodeLR left, TokenType type, NodeLR right)
     {
         this.left = left;
         this.token = type;
         this.right = right;
+    }
+
+    /// <summary>
+    /// Se realiza una operacion dependiendo del tokentype de este nodo
+    /// </summary>
+    public void OperateLeftRight()
+    {
+        variable = new VariablesFloat();
+        if (token.Equals(TokenType.MULT))
+        {
+            
+            variable.SetValue((float)left.value * (float)right.value);
+        }else if (token.Equals(TokenType.REAL_DIV))
+        {
+            if(right.value != 0)
+                variable.SetValue((float)left.value / (float)right.value);
+            else
+            {
+                throw new System.InvalidOperationException("Can't devide by zero");
+            }
+        }
+        else if (token.Equals(TokenType.PLUS))
+        {
+            variable.SetValue((float)left.value + (float)right.value);
+        }
+        else if (token.Equals(TokenType.MINUS))
+        {
+            variable.SetValue((float)left.value - (float)right.value);          
+        }
+        variable.ID = variable.GetValue().ToString();
+        value = variable.GetValue();
     }
 
 }
@@ -214,6 +257,44 @@ public class Tree : MonoBehaviour
     public List<Variables> VARIABLES;
 
     /// <summary>
+    /// Regresa una variable dentro de la lista global de variables, en caso de no existir, regresa nulo
+    /// </summary>
+    /// <param name="s"></param>
+    /// <returns></returns>
+    Variables GetVariableFromList(string s)
+    {
+        ///Itera por todas as variables
+        for (int i = 0; i < VARIABLES.Count; i++)
+        {
+            ///Si la variable en este indice tiene el mismo ID al argumento, regresa esta variable
+            if (VARIABLES[i].ID == s)
+            {
+                return VARIABLES[i];
+            }
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Cambia el valor de una variable Dentro de la lista de variables
+    /// </summary>
+    /// <param name="s"></param>
+    void ChangeVariableFromList(Variables s)
+    {
+        ///Itera sobre la lista de variables
+        for (int i = 0; i < VARIABLES.Count; i++)
+        {
+            ///Si el identificador es el mismo, cambia el nombre de la variable
+            if (VARIABLES[i].ID == s.ID)
+            {
+                VARIABLES[i] = s;
+                break;
+            }
+        }
+    }
+
+
+    /// <summary>
     /// String que se modificará dependiendo de los errores que vayan surgiendo a lo largo del programa
     /// </summary>
     string error = "";
@@ -257,8 +338,8 @@ public class Tree : MonoBehaviour
             ///La lista de tokens tiene un mayor número a cero
             if (tokenList.Count != 0)
             {
-                GetProgram();
-                PrintVars();
+                GetProgram(); ///Entra y busca si existe un programa
+                //PrintVars(); ///Imprime las variables
                 GetBegin();
                 first.PrintSons();
             }
@@ -307,43 +388,6 @@ public class Tree : MonoBehaviour
     }
 
     /// <summary>
-    /// Sección del texto donde se resuelven operaciones matemáticas
-    /// </summary>
-    void GetBegin()
-    {
-        if (tokenList[index].tokenType.Equals(TokenType.BEGIN))
-        {
-            Node2 Begin = new Node2(tokenList[index]);
-            Begin.name = tokenList[index].lexeme;
-            first.AddNode(Begin);
-            Debug.Log("You've arrived to the operations zone");
-            while (tokenList[Advance()].tokenType.Equals(TokenType.ID))
-            {
-                Assign();
-            }
-        }
-    }
-
-    void Assign()
-    {
-        if (tokenList[Advance()].tokenType.Equals(TokenType.ASSIGN))
-        {
-             ///Crear nodos donde se pregunta si el elemento actual es un número o un signo de operación binaria / unaria
-        }
-    }
-
-    /// <summary>
-    /// Imprime todas las variables globales que se encuentran dentro del árbol
-    /// </summary>
-    public void PrintVars()
-    {
-        for(int i = 0; i < VARIABLES.Count; i++)
-        {
-            Debug.Log("Variable: " + VARIABLES[i].ID + " type: " + VARIABLES[i].tokenType);
-        }
-    }
-
-    /// <summary>
     /// Obtenemos todas las variables que se encuentran dentro de la sección de VARS
     /// </summary>
     void GetVars()
@@ -362,7 +406,7 @@ public class Tree : MonoBehaviour
         if (tokenList[index].tokenType.Equals(TokenType.INTEGER))
         {
             ///Por cada uno de los strings dentro de la lista de strings, avanza
-            foreach(string id in ids)
+            foreach (string id in ids)
             {
                 ///Crea una variable de entero con el nombre de este string y con tipo entero
                 VariablesInt vI = new VariablesInt(id, TokenType.INTEGER);
@@ -390,7 +434,7 @@ public class Tree : MonoBehaviour
         }
         else
         {
-            
+
         }
         ids.Clear(); ///Libera la lista de strings
 
@@ -398,12 +442,206 @@ public class Tree : MonoBehaviour
     }
 
     /// <summary>
+    /// Sección del texto donde se resuelven operaciones matemáticas
+    /// </summary>
+    void GetBegin()
+    {
+        ///Pregunta si el token actual es igual a begin
+        if (tokenList[index].tokenType.Equals(TokenType.BEGIN))
+        {
+            Node2 Begin = new Node2(tokenList[index]); ///Crea un nodo begin 
+            Begin.name = tokenList[index].lexeme; //El nodo begin tiene el valor al elemento actual
+            first.AddNode(Begin); ///Añade el nodo al primer elemento del árbol
+            Assign();
+            PrintVars();
+            Debug.Log("You've arrived to the operations zone");
+
+        }
+        else
+        {
+            error += "Missing Begin Section!\n";
+        }
+    }
+
+    /// <summary>
+    /// Se asignan valores a las variables que se encuentran dentro de las variables globales
+    /// </summary>
+    void Assign()
+    {
+        ///Avanzar hasta que sea diferente de end, por lo que esta sección se terminaría
+        while(tokenList[index].tokenType != TokenType.END) 
+        {
+            if (tokenList[index].tokenType != TokenType.ID)
+                Advance();
+            if (tokenList[index].tokenType.Equals(TokenType.ID))
+            {
+
+                Variables var = GetVariableFromList(tokenList[index].lexeme);
+                if(tokenList[index].tokenType != TokenType.ASSIGN)
+                    Advance();
+                if (tokenList[index].tokenType.Equals(TokenType.ASSIGN))
+                {
+                    NodeLR nlr = GetExpretion();
+                    var.SetValue(nlr.value);
+                    ChangeVariableFromList(var);
+                }
+            }
+            else
+            {
+
+            }
+
+            ///Crear nodos donde se pregunta si el elemento actual es un número o un signo de operación binaria / unaria
+        }
+    }
+
+    /// <summary>
+    /// Obtener la expresión que se encuentra dentro de una línea de texto, dicha expresión nos permitirá asignarle un valor a una variable global
+    /// </summary>
+    /// <returns></returns>
+    NodeLR GetExpretion()
+    {
+        NodeLR term = GetTerm();
+        //Advance();
+        if (tokenList[index].tokenType.Equals(TokenType.PLUS))
+        {
+            NodeLR add = new NodeLR(term, TokenType.PLUS, GetTerm());
+            add.OperateLeftRight();
+            return add;
+        }
+        else if (tokenList[index].tokenType.Equals(TokenType.MINUS))
+        {
+            NodeLR resta = new NodeLR(term, TokenType.MINUS, GetTerm());
+            resta.OperateLeftRight();
+            return resta;
+        }
+        return term;
+    }
+
+    NodeLR GetTerm()
+    {
+        NodeLR factor = GetFactor();
+        Advance();
+        if (tokenList[index].tokenType.Equals(TokenType.MULT))
+        {
+            NodeLR mult = new NodeLR(factor, TokenType.MULT, GetFactor());
+            mult.OperateLeftRight();
+            return mult;
+        } else if (tokenList[index].tokenType.Equals(TokenType.REAL_DIV))
+        {
+            NodeLR div = new NodeLR(factor, TokenType.REAL_DIV, GetFactor());
+            div.OperateLeftRight();
+            return div;
+        }
+
+        return factor;
+    }
+    
+    /// <summary>
+    /// Se crea un nodo que regresa un entero o flotante y si hay un paréntesis, crea un while hasta que se cierre el paréntesis
+    /// </summary>
+    /// <returns></returns>
+    NodeLR GetFactor()
+    {
+        NodeLR toReturn = null;
+
+        if(tokenList[Advance()].tokenType != TokenType.LPAR)
+        {
+            toReturn = CheckUnarySigns();
+        }
+        else
+        {
+
+        }
+
+        return toReturn;
+    }
+
+    /// <summary>
+    /// Checa si hay un signo y avanza hasta que sea un entero, se pueden acumular la cantidad que sean necesarias de signos. Si el total es impar, el siguiente valor se multiplica por -1
+    /// </summary>
+    NodeLR CheckUnarySigns()
+    {
+        int indx = 0; ///Crea un index que nos indica cuántos signos negativos hay en el archivo
+
+        ///Avanza sí el siguiente token es un símbolo
+        while (tokenList[index].tokenType.Equals(TokenType.PLUS) || tokenList[index].tokenType.Equals(TokenType.MINUS))
+        {
+            ///El token es igual a el símbolo de menos
+            if (tokenList[index].tokenType.Equals(TokenType.MINUS))
+            {
+                indx++; ///Aumenta el índex
+            }
+            Advance();
+        }
+        VariablesFloat variables = new VariablesFloat(tokenList[index].lexeme, tokenList[index].tokenType);
+        float Num = CheckID(); ///Crea un número que mande a llamar la función de CheckID
+        ///El index es diferente de cero  y si el index tiene residuo diferente de cero, multiplica el valor por -1
+        if(indx != 0 && indx % 2 != 0)
+        {
+            Num *= -1;
+        }
+
+        variables.SetValue(Num);
+        return new NodeLR(variables);
+
+    }
+
+    /// <summary>
+    /// Checa si el elemento actual es un entero o un número real
+    /// </summary>
+    /// <returns></returns>
+    float CheckID()
+    {
+        ///Preguntar si el elemento actual dentro de la lista de tokens es un ID
+        if (tokenList[index].tokenType.Equals(TokenType.ID))
+        {
+            bool found = false;
+            ///Preguntar si el elemento actual se encuentra dentro de las variables globales del árbol
+            if (GetVariableFromList(tokenList[index].lexeme) != null)
+            {
+                found = true;
+            }
+            if (!found)
+            {
+                error += "Couldn't found this variable in the globla variables\n";
+            }
+            return (float)GetVariableFromList(tokenList[index].lexeme).GetValue();
+        }
+        else if (tokenList[index].tokenType == TokenType.INTEGER)
+        {
+            return float.Parse(tokenList[index].lexeme);
+        }
+        else if (tokenList[index].tokenType == TokenType.REAL)
+        {
+            return float.Parse(tokenList[index].lexeme);
+        }
+        Advance();
+        return 0;
+    }
+
+
+
+    /// <summary>
+    /// Imprime todas las variables globales que se encuentran dentro del árbol
+    /// </summary>
+    public void PrintVars()
+    {
+        for(int i = 0; i < VARIABLES.Count; i++)
+        {
+            Debug.Log("Variable: " + VARIABLES[i].ID + " type: " + VARIABLES[i].tokenType + " value: " + VARIABLES[i].GetValue());
+        }
+    }
+
+
+    /// <summary>
     /// Aumenta en uno el índice y regresa este nuevo valor
     /// </summary>
     /// <returns></returns>
     public int Advance()
     {
-        if (index + 1 < tokenList.Count)
+        int currInd = index;
+        if (currInd + 1 < tokenList.Count)
         {
             index++;
         }
@@ -438,6 +676,7 @@ public class Tree : MonoBehaviour
     Node factor() {
 
         Node node = null;
+    si es signo avanza hasta que sea entero o real
         if (currentToken.tokenType.Equals(TokenType.INTEGER)) { //Pregunta si el token actual es un entero
             node =  new Num(currentToken);
             validateToken(TokenType.INTEGER);
