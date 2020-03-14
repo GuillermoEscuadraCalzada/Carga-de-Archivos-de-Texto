@@ -8,7 +8,7 @@ public  static class KeyWords
     {
         {"PROGRAM", new Token(TokenType.PROGRAM, "PROGRAM") },
         {"VAR", new Token(TokenType.VAR, "VAR") },
-        {"DIV", new Token(TokenType.INTEGER_DIV, "DIV") },
+        {"DIV", new Token(TokenType.REAL_DIV, "DIV") },
         {"INTEGER", new Token(TokenType.INTEGER, "INTEGER") },
         {"REAL", new Token(TokenType.REAL, "REAL") },
         {"BEGIN", new Token(TokenType.BEGIN, "BEGIN") },

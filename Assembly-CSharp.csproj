@@ -83,6 +83,7 @@
     <None Include="Assets\StreamingAssets\Interprete.txt" />
     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_Bitmap-Custom-Atlas.shader" />
     <None Include="Assets\StreamingAssets\TokenType.txt" />
+    <None Include="Assets\StreamingAssets\Interprete2.txt" />
     <None Include="Assets\StreamingAssets\HolaMundo.txt" />
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
     <None Include="Assets\TextMesh Pro\Sprites\EmojiOne Attribution.txt" />

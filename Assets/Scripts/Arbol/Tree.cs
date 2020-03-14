@@ -172,7 +172,7 @@ public class NodeLR
         if (token.Equals(TokenType.MULT))
         {
             
-            variable.SetValue((float)left.value * (float)right.value);
+            variable.SetValue(variable.GetValue() + (float)left.value * (float)right.value);
         }else if (token.Equals(TokenType.REAL_DIV))
         {
             if(right.value != 0)
@@ -184,11 +184,11 @@ public class NodeLR
         }
         else if (token.Equals(TokenType.PLUS))
         {
-            variable.SetValue((float)left.value + (float)right.value);
+            variable.SetValue(variable.GetValue() + (float)left.value + (float)right.value);
         }
         else if (token.Equals(TokenType.MINUS))
         {
-            variable.SetValue((float)left.value - (float)right.value);          
+            variable.SetValue(variable.GetValue() + (float)left.value - (float)right.value);          
         }
         variable.ID = variable.GetValue().ToString();
         value = variable.GetValue();
@@ -501,19 +501,26 @@ public class Tree : MonoBehaviour
     /// <returns></returns>
     NodeLR GetExpretion()
     {
-        NodeLR term = GetTerm();
-        //Advance();
-        if (tokenList[index].tokenType.Equals(TokenType.PLUS))
+        NodeLR term = null;
+        while (tokenList[index].tokenType != TokenType.SEMI && tokenList[index].tokenType != TokenType.RPAR)
         {
-            NodeLR add = new NodeLR(term, TokenType.PLUS, GetTerm());
-            add.OperateLeftRight();
-            return add;
-        }
-        else if (tokenList[index].tokenType.Equals(TokenType.MINUS))
-        {
-            NodeLR resta = new NodeLR(term, TokenType.MINUS, GetTerm());
-            resta.OperateLeftRight();
-            return resta;
+
+            term = GetTerm();
+            //if(tokenList[index].tokenType != TokenType.PLUS || tokenList[index].tokenType != TokenType.MINUS)
+            //    Advance();
+            if (tokenList[index].tokenType.Equals(TokenType.PLUS))
+            {
+                NodeLR add = new NodeLR(term, TokenType.PLUS, GetExpretion());
+                add.OperateLeftRight();
+                return add;
+            }
+            else if (tokenList[index].tokenType.Equals(TokenType.MINUS))
+            {
+                NodeLR resta = new NodeLR(term, TokenType.MINUS, GetExpretion());
+                resta.OperateLeftRight();
+                return resta;
+            }
+            //Advance();
         }
         return term;
     }
@@ -521,15 +528,16 @@ public class Tree : MonoBehaviour
     NodeLR GetTerm()
     {
         NodeLR factor = GetFactor();
-        Advance();
+        //if(tokenList[index].tokenType != TokenType.MULT || tokenList[index].tokenType != TokenType.REAL_DIV)
+        // Advance();
         if (tokenList[index].tokenType.Equals(TokenType.MULT))
         {
-            NodeLR mult = new NodeLR(factor, TokenType.MULT, GetFactor());
+            NodeLR mult = new NodeLR(factor, TokenType.MULT, GetTerm());
             mult.OperateLeftRight();
             return mult;
         } else if (tokenList[index].tokenType.Equals(TokenType.REAL_DIV))
         {
-            NodeLR div = new NodeLR(factor, TokenType.REAL_DIV, GetFactor());
+            NodeLR div = new NodeLR(factor, TokenType.REAL_DIV, GetTerm());
             div.OperateLeftRight();
             return div;
         }
@@ -545,13 +553,18 @@ public class Tree : MonoBehaviour
     {
         NodeLR toReturn = null;
 
-        if(tokenList[Advance()].tokenType != TokenType.LPAR)
+        Advance();
+        if(tokenList[index].tokenType != TokenType.LPAR /*&& tokenList[index].tokenType != TokenType.RPAR*/)
         {
-            toReturn = CheckUnarySigns();
+            //toReturn = CheckUnarySigns();
+            return CheckUnarySigns();
         }
         else
         {
 
+            toReturn = GetExpretion();
+            Advance();
+            //return GetExpretion();
         }
 
         return toReturn;
@@ -576,8 +589,9 @@ public class Tree : MonoBehaviour
         }
         VariablesFloat variables = new VariablesFloat(tokenList[index].lexeme, tokenList[index].tokenType);
         float Num = CheckID(); ///Crea un número que mande a llamar la función de CheckID
+        Advance();
         ///El index es diferente de cero  y si el index tiene residuo diferente de cero, multiplica el valor por -1
-        if(indx != 0 && indx % 2 != 0)
+        if (indx != 0 && indx % 2 != 0)
         {
             Num *= -1;
         }
@@ -606,6 +620,7 @@ public class Tree : MonoBehaviour
             {
                 error += "Couldn't found this variable in the globla variables\n";
             }
+            //Advance();
             return (float)GetVariableFromList(tokenList[index].lexeme).GetValue();
         }
         else if (tokenList[index].tokenType == TokenType.INTEGER)
@@ -616,7 +631,6 @@ public class Tree : MonoBehaviour
         {
             return float.Parse(tokenList[index].lexeme);
         }
-        Advance();
         return 0;
     }
 

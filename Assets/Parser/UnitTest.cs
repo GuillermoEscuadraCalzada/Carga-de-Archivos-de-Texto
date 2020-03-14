@@ -24,7 +24,7 @@ public class UnitTest : MonoBehaviour
    string LoadFile()
    {
         string assetPath = Application.streamingAssetsPath;
-        string fileName = "Interprete.txt";
+        string fileName = "Interprete2.txt";
         string path = assetPath + "/" + fileName;
         print(path);
         StreamReader streamR = new StreamReader(path);
