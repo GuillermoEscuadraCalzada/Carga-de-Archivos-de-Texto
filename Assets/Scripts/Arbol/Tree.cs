@@ -12,25 +12,25 @@ public abstract class Variables
     /// El tipo de token que se le asignará a cada variable
     /// </summary>
     public TokenType tokenType;
-    
+
 
 
     /// <summary>
     /// El identificador de cada variable (nombre)
     /// </summary>
     public string ID;
-    
+
     /// <summary>
     /// Todas las variables tendrán un flotante pero se casteará a entero o se dejará así
     /// </summary>
     float value;
-   
+
     /// <summary>
     /// Función abstracta que regresa el valor de la variablem
     /// </summary>
     /// <returns></returns>
     public abstract float GetValue();
-    
+
     /// <summary>
     /// Función abstracta que modifica el valor de la variable
     /// </summary>
@@ -58,7 +58,7 @@ public class VariablesInt : Variables
         this.tokenType = type;
         this.ID = ID;
     }
-    
+
     /// <summary>
     /// Sobrescribe la función de su clase padre y regresa el valor de esta variable
     /// </summary>
@@ -129,7 +129,7 @@ public class NodeLR
     /// <summary>
     /// Token del nodo que lo distinguirá de otros
     /// </summary>
-    TokenType token; 
+    TokenType token;
 
     /// <summary>
     /// Constructor para la clase NodeLR que solo guardará una variable
@@ -149,7 +149,7 @@ public class NodeLR
     {
         token = type;
     }
-  
+
     /// <summary>
     /// Obtiene un nodo en la parte izquierda, un token y un nodo a la derecha. Dependiendo del token se puede realizar: suma, resta, multiplicación o división
     /// </summary>
@@ -171,11 +171,12 @@ public class NodeLR
         variable = new VariablesFloat();
         if (token.Equals(TokenType.MULT))
         {
-            
+
             variable.SetValue(variable.GetValue() + (float)left.value * (float)right.value);
-        }else if (token.Equals(TokenType.REAL_DIV))
+        }
+        else if (token.Equals(TokenType.REAL_DIV))
         {
-            if(right.value != 0)
+            if (right.value != 0)
                 variable.SetValue((float)left.value / (float)right.value);
             else
             {
@@ -188,7 +189,7 @@ public class NodeLR
         }
         else if (token.Equals(TokenType.MINUS))
         {
-            variable.SetValue(variable.GetValue() + (float)left.value - (float)right.value);          
+            variable.SetValue(variable.GetValue() + (float)left.value - (float)right.value);
         }
         variable.ID = variable.GetValue().ToString();
         value = variable.GetValue();
@@ -204,13 +205,13 @@ public class Node2
     /// </summary>
     Token token;
 
-    public string name;    
-    
+    public string name;
+
     /// <summary>
     /// Una lista de nodos hijo de este nodo
     /// </summary>
     List<Node2> hijos;
-   
+
     /// <summary>
     /// Constructor de la clase nodo que recibe un token como parámetro
     /// </summary>
@@ -221,7 +222,11 @@ public class Node2
         hijos = new List<Node2>();
     }
 
-   
+    public void ResetLists()
+    {
+        hijos.Clear();
+    }
+
 
     /// <summary>
     /// Función que añade hijos al nodo actual
@@ -234,7 +239,7 @@ public class Node2
 
     public void PrintSons()
     {
-        foreach(Node2 node in hijos)
+        foreach (Node2 node in hijos)
         {
             Debug.Log("Section: " + node.name);
         }
@@ -256,6 +261,14 @@ public class Tree : MonoBehaviour
     /// </summary>
     public List<Variables> VARIABLES;
 
+    public void ResetLists()
+    {
+        index = 0;
+        tokenList.Clear();
+        VARIABLES.Clear();
+        if (first != null)
+            first.ResetLists();
+    }
     /// <summary>
     /// Regresa una variable dentro de la lista global de variables, en caso de no existir, regresa nulo
     /// </summary>
@@ -339,7 +352,6 @@ public class Tree : MonoBehaviour
             if (tokenList.Count != 0)
             {
                 GetProgram(); ///Entra y busca si existe un programa
-                //PrintVars(); ///Imprime las variables
                 GetBegin();
                 first.PrintSons();
             }
@@ -347,7 +359,8 @@ public class Tree : MonoBehaviour
             { ///Lanza este error, la lista de tokens está vacía
                 throw new System.InvalidOperationException("This List is emty.");
             }
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             Debug.LogError("[" + e.GetType() + "] " + e.Message);
         }
@@ -417,7 +430,8 @@ public class Tree : MonoBehaviour
                 ///Añade este nodo a las variables globales
                 VARIABLES.Add(vI);
             }
-        } else if (tokenList[index].tokenType.Equals(TokenType.REAL))
+        }
+        else if (tokenList[index].tokenType.Equals(TokenType.REAL))
         { ///El elemento actual es un número real
 
             ///Por cada uno de los strings, avanza
@@ -431,10 +445,6 @@ public class Tree : MonoBehaviour
 
                 VARIABLES.Add(vI); ///Añade esta variable a las variables globales
             }
-        }
-        else
-        {
-
         }
         ids.Clear(); ///Libera la lista de strings
 
@@ -469,15 +479,15 @@ public class Tree : MonoBehaviour
     void Assign()
     {
         ///Avanzar hasta que sea diferente de end, por lo que esta sección se terminaría
-        while(tokenList[index].tokenType != TokenType.END) 
+        while (tokenList[index].tokenType != TokenType.END)
         {
             if (tokenList[index].tokenType != TokenType.ID)
                 Advance();
+            
             if (tokenList[index].tokenType.Equals(TokenType.ID))
             {
-
                 Variables var = GetVariableFromList(tokenList[index].lexeme);
-                if(tokenList[index].tokenType != TokenType.ASSIGN)
+                if (tokenList[index].tokenType != TokenType.ASSIGN)
                     Advance();
                 if (tokenList[index].tokenType.Equals(TokenType.ASSIGN))
                 {
@@ -535,16 +545,23 @@ public class Tree : MonoBehaviour
             NodeLR mult = new NodeLR(factor, TokenType.MULT, GetTerm());
             mult.OperateLeftRight();
             return mult;
-        } else if (tokenList[index].tokenType.Equals(TokenType.REAL_DIV))
+        }
+        else if (tokenList[index].tokenType.Equals(TokenType.REAL_DIV))
         {
             NodeLR div = new NodeLR(factor, TokenType.REAL_DIV, GetTerm());
+            div.OperateLeftRight();
+            return div;
+        }
+        else if (tokenList[index].tokenType.Equals(TokenType.LPAR))
+        {
+            NodeLR div = new NodeLR(factor, TokenType.MULT, GetExpretion());
             div.OperateLeftRight();
             return div;
         }
 
         return factor;
     }
-    
+
     /// <summary>
     /// Se crea un nodo que regresa un entero o flotante y si hay un paréntesis, crea un while hasta que se cierre el paréntesis
     /// </summary>
@@ -554,7 +571,7 @@ public class Tree : MonoBehaviour
         NodeLR toReturn = null;
 
         Advance();
-        if(tokenList[index].tokenType != TokenType.LPAR /*&& tokenList[index].tokenType != TokenType.RPAR*/)
+        if (tokenList[index].tokenType != TokenType.LPAR /*&& tokenList[index].tokenType != TokenType.RPAR*/)
         {
             //toReturn = CheckUnarySigns();
             return CheckUnarySigns();
@@ -641,9 +658,9 @@ public class Tree : MonoBehaviour
     /// </summary>
     public void PrintVars()
     {
-        for(int i = 0; i < VARIABLES.Count; i++)
+        for (int i = 0; i < VARIABLES.Count; i++)
         {
-            Debug.Log("Variable: " + VARIABLES[i].ID + " type: " + VARIABLES[i].tokenType + " value: " + VARIABLES[i].GetValue());
+            Debug.Log("Variable: " + VARIABLES[i].ID + " type: " + VARIABLES[i].tokenType + " value = " + VARIABLES[i].GetValue());
         }
     }
 
@@ -658,10 +675,6 @@ public class Tree : MonoBehaviour
         if (currInd + 1 < tokenList.Count)
         {
             index++;
-        }
-        else
-        {
-            //throw new System.
         }
         return index;
     }

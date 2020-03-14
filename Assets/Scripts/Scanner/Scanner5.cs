@@ -41,7 +41,7 @@ public class Scanner5 : MonoBehaviour
     /// <summary>
     /// Se resetea el escaner, todos las variables vuelven a su estado principal
     /// </summary>
-    private void resetScan()
+    public void resetScan()
     {
         tokenList.Clear();
         start = 0;
